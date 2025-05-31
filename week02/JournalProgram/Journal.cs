@@ -2,97 +2,100 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace JournalApp
+/// <summary>
+/// Represents a journal that holds multiple entries and allows writing, displaying,
+/// saving, loading, and deleting entries.
+/// </summary>
+public class Journal
 {
+    // Private list holds all Entry objects.
+    private List<Entry> _entries = new List<Entry>();
+
     /// <summary>
-    /// Represents the entire journal, holding an internal list of Entry objects
-    /// and providing methods to manipulate them.
+    /// Public property exposing how many entries are currently stored.
+    /// This helps other classes check if the journal has any entries.
     /// </summary>
-    public class Journal
+    public int EntryCount => _entries.Count;
+
+    /// <summary>
+    /// Write a new entry given a prompt. Prompts are provided externally.
+    /// </summary>
+    /// <param name="prompt">The writing prompt to show to the user.</param>
+    public void WriteEntry(string prompt)
     {
-        // Private list of entries; outside code cannot modify it directly.
-        private List<Entry> _entries = new List<Entry>();
+        Console.Write("Your Response: ");
+        string response = Console.ReadLine() ?? "";
+        string dateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        _entries.Add(new Entry(dateTime, prompt, response));
+    }
 
-        /// <summary>
-        /// Adds a new Entry to the journal.
-        /// (Functionality: “Journal Writing” – 10 pts)
-        /// </summary>
-        public void AddEntry(Entry entry)
+    /// <summary>
+    /// Display every current entry in the journal by calling Entry.Display().
+    /// </summary>
+    public void Display()
+    {
+        if (_entries.Count == 0)
         {
-            _entries.Add(entry);
+            Console.WriteLine("— No entries in the journal —\n");
+            return;
         }
 
-        /// <summary>
-        /// Displays all entries in the journal, printing date, prompt, and response.
-        /// (Functionality: “Journal Display” – 10 pts)
-        /// </summary>
-        public void Display()
+        for (int i = 0; i < _entries.Count; i++)
         {
-            if (_entries.Count == 0)
-            {
-                Console.WriteLine("Journal is empty.");
-                return;
-            }
+            Console.WriteLine($"[{i}] ---------------------");
+            _entries[i].Display();
+        }
+    }
 
-            for (int i = 0; i < _entries.Count; i++)
+    /// <summary>
+    /// Save all entries to a text file, one CSV line per entry.
+    /// </summary>
+    /// <param name="filename">The target filename (e.g., "journal.txt").</param>
+    public void SaveToFile(string filename)
+    {
+        using (StreamWriter writer = new StreamWriter(filename))
+        {
+            foreach (var entry in _entries)
             {
-                Console.WriteLine($"Entry #{i}");
-                _entries[i].Display();
+                writer.WriteLine(entry.ToCsvString());
             }
         }
+    }
 
-        /// <summary>
-        /// Saves the entire journal to a CSV file (one line per Entry).
-        /// (Functionality: “Saving” – 10 pts)
-        /// </summary>
-        public void SaveToFile(string filename)
+    /// <summary>
+    /// Load entries from a file. Clears existing entries, reads each line,
+    /// and builds Entry objects via Entry.FromCsvString().
+    /// </summary>
+    /// <param name="filename">The filename to load from (e.g., "journal.txt").</param>
+    public void LoadFromFile(string filename)
+    {
+        _entries.Clear();
+
+        if (!File.Exists(filename))
         {
-            using (StreamWriter outputFile = new StreamWriter(filename))
-            {
-                foreach (var entry in _entries)
-                {
-                    outputFile.WriteLine(entry.ToCsvString());
-                }
-            }
+            Console.WriteLine($"File '{filename}' not found. Starting with an empty journal.\n");
+            return;
         }
 
-        /// <summary>
-        /// Loads the journal from a CSV file, replacing the current list of entries.
-        /// (Functionality: “Loading” – 10 pts)
-        /// </summary>
-        public void LoadFromFile(string filename)
+        string[] lines = File.ReadAllLines(filename);
+        foreach (var line in lines)
         {
-            if (!File.Exists(filename))
-            {
-                Console.WriteLine($"File \"{filename}\" does not exist.");
-                return;
-            }
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
 
-            _entries.Clear();
-            string[] lines = File.ReadAllLines(filename);
-
-            foreach (string line in lines)
-            {
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
-
-                Entry entry = Entry.FromCsvString(line);
-                _entries.Add(entry);
-            }
+            _entries.Add(Entry.FromCsvString(line));
         }
+    }
 
-        /// <summary>
-        /// Deletes the entry at the given index. Returns true if successful.
-        /// (Creative extension, not in core requirements.)
-        /// </summary>
-        public bool DeleteEntry(int index)
+    /// <summary>
+    /// Remove an entry by its zero-based index, if valid.
+    /// </summary>
+    /// <param name="index">Index of the entry to remove.</param>
+    public void DeleteEntry(int index)
+    {
+        if (index >= 0 && index < _entries.Count)
         {
-            if (index < 0 || index >= _entries.Count)
-            {
-                return false;
-            }
             _entries.RemoveAt(index);
-            return true;
         }
     }
 }

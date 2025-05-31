@@ -1,74 +1,64 @@
 using System;
 
-namespace JournalApp
+/// <summary>
+/// Represents a single journal entry with a timestamp, prompt, and response.
+/// </summary>
+public class Entry
 {
+    // Private fields store the internal data.
+    private string _dateTime;
+    private string _prompt;
+    private string _response;
+
     /// <summary>
-    /// Represents a single journal entry: stores date/time, prompt, and response.
+    /// Constructor for an Entry. Users of this class only see these three pieces of information.
     /// </summary>
-    public class Entry
+    /// <param name="dateTime">When the entry was created (formatted string).</param>
+    /// <param name="prompt">The writing prompt text.</param>
+    /// <param name="response">The user’s written response.</param>
+    public Entry(string dateTime, string prompt, string response)
     {
-        // Private field for the date and time of this entry.
-        private string _dateTime;
+        _dateTime = dateTime;
+        _prompt = prompt;
+        _response = response;
+    }
 
-        // Private field for the prompt text.
-        private string _prompt;
+    /// <summary>
+    /// Create an Entry from a CSV-formatted line (DateTime,Prompt,Response).
+    /// </summary>
+    /// <param name="csvLine">A single line from the saved file.</param>
+    /// <returns>A new Entry object.</returns>
+    public static Entry FromCsvString(string csvLine)
+    {
+        // Expecting CSV like: "2023-05-31 14:23:45","My prompt","My response"
+        string[] parts = csvLine.Split(new[] { ',' }, 3);
 
-        // Private field for the user’s response.
-        private string _response;
+        // Remove surrounding quotes, if any
+        string dateTime = parts[0].TrimStart('"').TrimEnd('"');
+        string prompt    = parts[1].TrimStart('"').TrimEnd('"');
+        string response  = parts[2].TrimStart('"').TrimEnd('"');
 
-        /// <summary>
-        /// Constructs a new Entry with a full timestamp, prompt, and response.
-        /// </summary>
-        /// <param name="dateTime">Timestamp in "yyyy-MM-dd HH:mm:ss" format.</param>
-        /// <param name="prompt">The prompt text shown to the user.</param>
-        /// <param name="response">The user’s response to the prompt.</param>
-        public Entry(string dateTime, string prompt, string response)
-        {
-            _dateTime = dateTime;
-            _prompt = prompt;
-            _response = response;
-        }
+        return new Entry(dateTime, prompt, response);
+    }
 
-        /// <summary>
-        /// Displays this entry to the console in a readable format.
-        /// </summary>
-        public void Display()
-        {
-            Console.WriteLine($"Date: {_dateTime}");
-            Console.WriteLine($"Prompt: {_prompt}");
-            Console.WriteLine($"Response: {_response}");
-            Console.WriteLine(new string('-', 30));
-        }
+    /// <summary>
+    /// Convert this Entry to a CSV line (including quotes to handle commas).
+    /// </summary>
+    /// <returns>A CSV-formatted string representing this entry.</returns>
+    public string ToCsvString()
+    {
+        // Surround each field with quotes in case they contain commas
+        return $"\"{_dateTime}\",\"{_prompt}\",\"{_response}\"";
+    }
 
-        /// <summary>
-        /// Converts this entry to a CSV line:
-        /// "yyyy-MM-dd HH:mm:ss","prompt","response"
-        /// </summary>
-        public string ToCsvString()
-        {
-            // Escape any internal double quotes in prompt and response
-            string escapedPrompt = _prompt.Replace("\"", "\"\"");
-            string escapedResponse = _response.Replace("\"", "\"\"");
-            return $"\"{_dateTime}\",\"{escapedPrompt}\",\"{escapedResponse}\"";
-        }
-
-        /// <summary>
-        /// Creates an Entry object from a CSV line in the format:
-        /// "yyyy-MM-dd HH:mm:ss","prompt","response"
-        /// </summary>
-        public static Entry FromCsvString(string csvLine)
-        {
-            // Split into three parts: timestamp, prompt, and response
-            // Assume csvLine looks like:
-            //   "2025-05-31 14:23:45","My prompt","My response"
-            string[] parts = csvLine.Split(new[] { "\",\"" }, StringSplitOptions.None);
-            // parts[0] == "\"2025-05-31 14:23:45"
-            // parts[1] == "My prompt"
-            // parts[2] == "My response\""
-            string dateTime = parts[0].TrimStart('"');
-            string prompt = parts[1].TrimEnd('"');
-            string response = parts[2].TrimEnd('"');
-            return new Entry(dateTime, prompt, response);
-        }
+    /// <summary>
+    /// Display the entry on the console: date/time, prompt, and response.
+    /// </summary>
+    public void Display()
+    {
+        Console.WriteLine($"Date:    {_dateTime}");
+        Console.WriteLine($"Prompt:  {_prompt}");
+        Console.WriteLine($"Response: {_response}");
+        Console.WriteLine();
     }
 }
