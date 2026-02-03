@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using ScriptureMemorizer;
+
+namespace ScriptureMemorizer;
 
 class Program
 {
