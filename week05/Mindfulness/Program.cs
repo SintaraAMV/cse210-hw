@@ -1,9 +1,12 @@
 /*
-Exceeding Requirements:
-1. Added a fourth activity: Gratitude Activity. This activity prompts the user to reflect on things they are grateful for and offers to save their reflection to a gratitude journal file.
-2. Implemented an activity log that records each completed activity with a timestamp in a file named "activity_log.txt".
-3. Enhanced user interaction by allowing the user to save their gratitude reflection to a file.
-4. The program now handles basic file I/O operations for persistence.
+EXCEEDING REQUIREMENTS - CREATIVITY FEATURES:
+1. Added a "Gratitude Journal" activity as a 4th option
+2. Implemented activity logging to track user progress
+3. Added color coding for different activities
+4. Created a progress spinner that shows percentage completion
+5. Added motivational quotes after each activity completion
+6. Implemented input validation for duration
+7. Added ASCII art for activity transitions
 */
 using System;
 using System.IO;
@@ -23,11 +26,11 @@ class Program
         {
             Console.Clear();
             Console.WriteLine("Menu Options:");
-            Console.WriteLine("  1. Start breathing activity");
-            Console.WriteLine("  2. Start reflecting activity");
-            Console.WriteLine("  3. Start listing activity");
-            Console.WriteLine("  4. Start gratitude activity");  // New activity
-            Console.WriteLine("  5. Quit");
+            Console.WriteLine("1. Breathing Activity");
+            Console.WriteLine("2. Reflection Activity");
+            Console.WriteLine("3. Listing Activity");
+            Console.WriteLine("4. Gratitude Journal");  // NUEVO
+            Console.WriteLine("5. Exit");
             Console.Write("Select a choice from the menu: ");
             string choice = Console.ReadLine();
 
